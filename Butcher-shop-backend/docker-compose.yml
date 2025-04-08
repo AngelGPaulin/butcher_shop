@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:14.3
+    container_name: ${CARNICERIA_DB_CONTAINER_NAME}
+    restart: always
+    ports:
+      - "${CARNICERIA_DB_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${CARNICERIA_DB_USER}
+      POSTGRES_PASSWORD: ${CARNICERIA_DB_PASS}
+      POSTGRES_DB: ${CARNICERIA_DB_NAME}
+    volumes:
+      - ./postgres-carniceria:/var/lib/postgresql/data
