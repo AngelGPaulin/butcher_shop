@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { TOKEN_NAME } from "@/constants";
 
 // Carga de fuentes personalizadas
+/*
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -15,7 +16,7 @@ const geistMono = localFont({
   src: "../fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
-});
+});*/
 
 export const metadata: Metadata = {
   title: "Dashboard | Carnicería",
@@ -39,7 +40,8 @@ export default async function DashboardLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-orange-50`}
+        // className={`${geistSans.variable} ${geistMono.variable} antialiased bg-orange-50`}
+        className={` antialiased bg-orange-50`}
       >
         <main className="w-full h-full flex">
           {children}
