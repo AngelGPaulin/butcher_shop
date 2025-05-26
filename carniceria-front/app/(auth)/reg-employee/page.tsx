@@ -14,7 +14,7 @@ const initialState = {
   nombre_usuario: "",
   contrasena: "",
   rol: "Employee",
-  locationId: "",
+  locationId: "", //sucursal seleccionada
 };
 
 const RegUsua = () => {
