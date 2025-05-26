@@ -4,11 +4,13 @@ import {
     Column,
     ManyToOne,
     CreateDateColumn,
+    OneToMany,
   } from 'typeorm';
   import { Product } from 'src/products/entities/product.entity';
   import { Location } from 'src/locations/entities/location.entity';
   import { User } from 'src/auth/entities/user.entity';
   import { ApiProperty } from '@nestjs/swagger';
+import { Provider } from 'src/providers/entities/provider.entity';
   
   @Entity()
   export class StockMovement {
@@ -39,5 +41,10 @@ import {
     @ApiProperty({ type: () => User })
     @ManyToOne(() => User, { eager: true })
     registradoPor: User;
+
+    @ManyToOne(() => Provider, (provider) => provider.movimientos, { eager: true, nullable: true })
+    proveedor: Provider;
+
+
   }
   

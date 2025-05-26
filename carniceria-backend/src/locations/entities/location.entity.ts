@@ -6,6 +6,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Sale } from 'src/sales/entities/sale.entity';
+import { Product } from 'src/products/entities/product.entity';
 
 @Entity()
 export class Location {
@@ -26,4 +27,6 @@ export class Location {
 
   @OneToMany(() => Sale, (sale) => sale.location)
   ventas: Sale[];
+  @OneToMany(() => Product, (product) => product.location)
+  productos: Product[];
 }
