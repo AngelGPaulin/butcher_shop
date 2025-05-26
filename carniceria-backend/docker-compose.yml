@@ -1,7 +1,7 @@
-version: "3.9"
+# version: "3.9"
 
 services:
-  db:
+  postgres-carniceria:
     image: postgres:14.3
     container_name: ${CARNICERIA_DB_CONTAINER_NAME}
     restart: always

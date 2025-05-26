@@ -41,7 +41,7 @@ export default function LoginPage() {
         if (result.rol === "Admin") {
           router.push("/admin");
         } else {
-          router.push("/admin/user");//redirigimiento al empleado
+          router.push("/empleado");//redirigimiento al empleado   --outgether
         }
       } else {
         const errorText = await res.text();

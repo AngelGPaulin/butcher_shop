@@ -81,6 +81,15 @@
   font-size: 15px;
   cursor: pointer;
 }
+.btn-repVenta {
+  background: #000000;
+  color: #fff;
+  border: 2px solid #222;
+  border-radius: 18px;
+  padding: 10px 24px;
+  font-size: 15px;
+  cursor: pointer;
+}
 
 .admin-table-container {
   background: #fff;
@@ -166,8 +175,9 @@
 
 .admin-report-box {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 12px;
   min-width: 200px;
   min-height: 140px;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
