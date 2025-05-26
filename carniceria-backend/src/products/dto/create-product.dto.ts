@@ -9,7 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Product } from '../entities/product.entity';
 import { OmitType } from '@nestjs/mapped-types';
-import {Provider} from "../../providers/entities/provider.entity"; 
+import { Provider } from '../../providers/entities/provider.entity';
 
 export class CreateProductDto extends OmitType(Product, ['productId'] as const) {
   @ApiProperty({ required: false })

@@ -36,7 +36,12 @@ export default function LoginPage() {
         const result = await res.json();
         console.log("✅ Login success:", result);
 
-        router.push("/dashboard");
+        // Redirección según el rol
+        if (result.rol === "Admin") {
+          router.push("/admin");
+        } else {
+          router.push("/empleado");
+        }
       } else {
         const errorText = await res.text();
         console.error("❌ Login fallido. Respuesta:", errorText);
