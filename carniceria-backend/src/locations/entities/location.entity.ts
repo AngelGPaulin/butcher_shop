@@ -27,6 +27,7 @@ export class Location {
 
   @OneToMany(() => Sale, (sale) => sale.location)
   ventas: Sale[];
+
   @OneToMany(() => Product, (product) => product.location)
   productos: Product[];
 }

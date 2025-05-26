@@ -25,7 +25,6 @@ const RegEmployee = () => {
   >([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar sucursales al montar
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -66,10 +65,10 @@ const RegEmployee = () => {
         apellido: form.apellido,
         telefono: form.telefono,
         direccion: form.direccion,
-        nombre_usuario: form.username, // nombre del campo esperado por el backend
-        contrasena: form.password, // nombre del campo esperado por el backend
+        nombre_usuario: form.username, // campo esperado por el backend
+        contrasena: form.password,     // campo esperado por el backend
         rol: form.rol,
-        location: form.nomSucursal, // debe coincidir con la relación ManyToOne
+        location: form.nomSucursal,    // debe coincidir con la relación ManyToOne
       };
 
       const res = await fetch(`${API_URL}/auth/register`, {
