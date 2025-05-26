@@ -11,13 +11,13 @@ const initialState = {
   apellido: "",
   telefono: "",
   direccion: "",
-  nombre_usuario: "",
-  contrasena: "",
-  rol: "Employee",
-  locationId: "",
+  username: "",
+  rol: "Empleado",
+  password: "",
+  nomSucursal: "",
 };
 
-const RegUsua = () => {
+const RegEmployee = () => {
   const [form, setForm] = useState(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [sucursales, setSucursales] = useState<
@@ -25,7 +25,6 @@ const RegUsua = () => {
   >([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Obtener sucursales con headers autenticados
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -60,23 +59,30 @@ const RegUsua = () => {
     setSubmitting(true);
     try {
       const headers = await authHeaders();
-      const res = await fetch(`${API_URL}/auth/signup`, {
+
+      const payload = {
+        nombre: form.nombre,
+        apellido: form.apellido,
+        telefono: form.telefono,
+        direccion: form.direccion,
+        nombre_usuario: form.username, // campo esperado por el backend
+        contrasena: form.password,     // campo esperado por el backend
+        rol: form.rol,
+        location: form.nomSucursal,    // debe coincidir con la relación ManyToOne
+      };
+
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
-        headers: {
-          ...headers,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        headers,
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         alert("Usuario registrado correctamente");
         setForm(initialState);
-        // Redirigir después de registro exitoso
-        window.location.href = "/admin";
       } else {
-        const errorData = await res.json();
-        alert(`Error al registrar usuario: ${errorData.message || res.statusText}`);
+        const errorText = await res.text();
+        alert("Error al registrar usuario: " + errorText);
       }
     } catch (err) {
       alert("Error de red al registrar usuario");
@@ -113,8 +119,8 @@ const RegUsua = () => {
           <label>Nombre de usuario:</label>
           <input
             type="text"
-            name="nombre_usuario"
-            value={form.nombre_usuario}
+            name="username"
+            value={form.username}
             onChange={handleChange}
             required
           />
@@ -132,8 +138,8 @@ const RegUsua = () => {
         <div className="form-group">
           <label>Rol:</label>
           <select name="rol" value={form.rol} onChange={handleChange} required>
-            <option value="Employee">Employee</option>
-            <option value="Admin">Admin</option>
+            <option value="Empleado">Empleado</option>
+            <option value="Administrador">Administrador</option>
           </select>
         </div>
         <div className="form-group">
@@ -150,8 +156,8 @@ const RegUsua = () => {
           <label>Contraseña:</label>
           <input
             type="password"
-            name="contrasena"
-            value={form.contrasena}
+            name="password"
+            value={form.password}
             onChange={handleChange}
             required
           />
@@ -167,11 +173,11 @@ const RegUsua = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="locationId">Nombre de sucursal:</label>
+          <label htmlFor="nomSucursal">Nombre de sucursal:</label>
           <select
-            id="locationId"
-            name="locationId"
-            value={form.locationId}
+            id="nomSucursal"
+            name="nomSucursal"
+            value={form.nomSucursal}
             onChange={handleChange}
             required
           >
@@ -199,4 +205,4 @@ const RegUsua = () => {
   );
 };
 
-export default RegUsua;
+export default RegEmployee;

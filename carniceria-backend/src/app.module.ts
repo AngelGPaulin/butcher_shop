@@ -8,6 +8,7 @@ import { SalesModule } from './sales/sales.module';
 import { StockModule } from './stock/stock.module';
 import { SalesHistoryModule } from './sales-history/sales-history.module';
 import { ProductsModule } from './products/products.module'; 
+import { ProvidersModule } from './providers/providers.module';
 
 @Module({
   imports: [
@@ -15,23 +16,31 @@ import { ProductsModule } from './products/products.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('CARNICERIA_DB_HOST'),
-        port: config.get<number>('CARNICERIA_DB_PORT'),
-        username: config.get<string>('CARNICERIA_DB_USER'),
-        password: config.get<string>('CARNICERIA_DB_PASS'),
-        database: config.get<string>('CARNICERIA_DB_NAME'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+      useFactory: (config: ConfigService) => {
+        const host = config.get<string>('CARNICERIA_DB_HOST');
+        const port = config.get<number>('CARNICERIA_DB_PORT');
+        const username = config.get<string>('CARNICERIA_DB_USER');
+        const password = config.get<string>('CARNICERIA_DB_PASS');
+        const database = config.get<string>('CARNICERIA_DB_NAME');
+        return {
+          type: 'postgres',
+          host,
+          port,
+          username,
+          password,
+          database,
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+      },
     }),
     AuthModule,
     LocationsModule,
     SalesModule,
     StockModule,
     SalesHistoryModule,
-    ProductsModule, 
+    ProductsModule,
+    ProvidersModule,
   ],
 })
 export class AppModule {}
