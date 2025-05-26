@@ -1,0 +1,64 @@
+.login-logo {
+  display: block;
+  margin: 0 auto 24px auto;
+  max-width: 180px;
+}
+
+.login-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.input-custom,
+.button-custom {
+  width: 100%;
+  border-radius: 9999px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.input-custom {
+  background: #a0aec0;
+  color: white;
+  border: none;
+  margin-bottom: 12px;
+  padding: 0.5rem 1rem;
+}
+
+.input-custom::placeholder {
+  color: #e2e8f0;
+  opacity: 1;
+}
+
+.button-custom {
+  background: black;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-weight: 400;
+  box-shadow: none;
+  margin-bottom: 10px;
+  transition: background 0.2s;
+  border: none;
+}
+
+.button-custom:hover {
+  background: #2d3748;
+}
+
+.forgot-link {
+  color: black;
+  text-decoration: underline;
+  text-align: center;
+  display: block;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.signup-link {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 600;
+}

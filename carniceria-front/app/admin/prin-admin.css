@@ -1,0 +1,183 @@
+.admin-container {
+  background: #ffffff;
+  min-height: 100vh;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-start;
+  background: #bfc5c9;
+  border-radius: 10px 10px 0 0;
+  padding: 16px 24px;
+  gap: 32px;
+}
+
+.admin-logo {
+  width: 200px;
+  margin-right: 24px;
+}
+
+.admin-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-right: 32px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-weight: bold;
+  color: #333;
+}
+
+.admin-filters select {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #888;
+  background: #e0e4e7;
+}
+
+.btn-consultar {
+  margin-top: 8px;
+  padding: 8px 18px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.btn-action {
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 18px;
+  padding: 10px 24px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-report {
+  background: #000000;
+  color: #fff;
+  border: 2px solid #222;
+  border-radius: 18px;
+  padding: 10px 24px;
+  font-size: 15px;
+  cursor: pointer;
+}
+.btn-repVenta {
+  background: #000000;
+  color: #fff;
+  border: 2px solid #222;
+  border-radius: 18px;
+  padding: 10px 24px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.admin-table-container {
+  background: #fff;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 18px 12px 12px 12px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 1px solid #bfc5c9;
+  padding: 8px 10px;
+  text-align: left;
+  background: #e0e4e7;
+  color: #222;
+}
+
+.admin-table th {
+  background: #bfc5c9;
+  font-weight: bold;
+}
+
+.admin-total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+}
+
+.admin-total input {
+  width: 120px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #bfc5c9;
+  background: #e0e4e7;
+}
+
+.admin-header-4 {
+  display: flex;
+  align-items: flex-start;
+  border-radius: 10px 10px 0 0;
+  padding: 16px 24px;
+  gap: 32px;
+  justify-content: space-between;
+}
+
+.admin-logo-box {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 120px;
+}
+
+.admin-header-right {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.admin-filters-box {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 220px;
+  min-height: 140px;
+}
+
+.admin-actions-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 200px;
+  min-height: 140px;
+  justify-content: flex-start;
+}
+
+.admin-report-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 200px;
+  min-height: 140px;
+  justify-content: flex-start;
+}
