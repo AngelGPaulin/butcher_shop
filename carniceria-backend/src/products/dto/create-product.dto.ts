@@ -9,6 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Product } from '../entities/product.entity';
 import { OmitType } from '@nestjs/mapped-types';
+import {Provider} from "../../providers/entities/provider.entity"; 
 
 export class CreateProductDto extends OmitType(Product, ['productId'] as const) {
   @ApiProperty({ required: false })
@@ -40,4 +41,12 @@ export class CreateProductDto extends OmitType(Product, ['productId'] as const) 
   @ApiProperty({ default: true })
   @IsBoolean()
   disponible: boolean;
+
+  @ApiProperty()
+  @IsUUID()
+  locationId: string;
+
+  @ApiProperty()
+  @IsUUID()
+  providerId: string;
 }
