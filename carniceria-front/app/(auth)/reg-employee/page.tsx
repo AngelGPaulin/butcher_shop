@@ -11,13 +11,13 @@ const initialState = {
   apellido: "",
   telefono: "",
   direccion: "",
-  username: "",
-  rol: "Empleado",
-  password: "",
-  nomSucursal: "",
+  nombre_usuario: "",
+  contrasena: "",
+  rol: "Employee",
+  locationId: "", //sucursal seleccionada
 };
 
-const RegEmployee = () => {
+const RegUsua = () => {
   const [form, setForm] = useState(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [sucursales, setSucursales] = useState<
@@ -66,23 +66,30 @@ const RegEmployee = () => {
         telefono: form.telefono,
         direccion: form.direccion,
         nombre_usuario: form.username, // campo esperado por el backend
-        contrasena: form.password,     // campo esperado por el backend
+        contrasena: form.password, // campo esperado por el backend
         rol: form.rol,
-        location: form.nomSucursal,    // debe coincidir con la relación ManyToOne
+        location: form.nomSucursal, // debe coincidir con la relación ManyToOne
       };
 
       const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
-        headers,
-        body: JSON.stringify(payload),
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
       });
 
       if (res.ok) {
         alert("Usuario registrado correctamente");
         setForm(initialState);
+        // Redirigir después de registro exitoso
+        window.location.href = "/admin";
       } else {
-        const errorText = await res.text();
-        alert("Error al registrar usuario: " + errorText);
+        const errorData = await res.json();
+        alert(
+          `Error al registrar usuario: ${errorData.message || res.statusText}`
+        );
       }
     } catch (err) {
       alert("Error de red al registrar usuario");
@@ -119,8 +126,8 @@ const RegEmployee = () => {
           <label>Nombre de usuario:</label>
           <input
             type="text"
-            name="username"
-            value={form.username}
+            name="nombre_usuario"
+            value={form.nombre_usuario}
             onChange={handleChange}
             required
           />
@@ -138,8 +145,8 @@ const RegEmployee = () => {
         <div className="form-group">
           <label>Rol:</label>
           <select name="rol" value={form.rol} onChange={handleChange} required>
-            <option value="Empleado">Empleado</option>
-            <option value="Administrador">Administrador</option>
+            <option value="Employee">Employee</option>
+            <option value="Admin">Admin</option>
           </select>
         </div>
         <div className="form-group">
@@ -156,8 +163,8 @@ const RegEmployee = () => {
           <label>Contraseña:</label>
           <input
             type="password"
-            name="password"
-            value={form.password}
+            name="contrasena"
+            value={form.contrasena}
             onChange={handleChange}
             required
           />
@@ -173,11 +180,11 @@ const RegEmployee = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="nomSucursal">Nombre de sucursal:</label>
+          <label htmlFor="locationId">Nombre de sucursal:</label>
           <select
-            id="nomSucursal"
-            name="nomSucursal"
-            value={form.nomSucursal}
+            id="locationId"
+            name="locationId"
+            value={form.locationId}
             onChange={handleChange}
             required
           >
@@ -205,4 +212,4 @@ const RegEmployee = () => {
   );
 };
 
-export default RegEmployee;
+export default RegUsua;

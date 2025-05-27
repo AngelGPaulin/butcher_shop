@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Res,
   UnauthorizedException,
+  Get,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -17,6 +18,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { TOKEN_NAME } from './constants/jwt.constants';
 import { Cookies } from './decorators/cookies.decorator';
+import { Auth } from './decorators/auth.decorator';
+import { ROLES } from 'src/auth/constants/roles.constants';
+
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -57,4 +61,10 @@ export class AuthController {
   ) {
     return this.authService.updateUser(userId, updateUserDto);
   }
+  @Get()
+  @Auth(ROLES.ADMIN)
+  @ApiOperation({ summary: 'Listar todos los usuarios' })
+  findAllUsers() {
+    return this.authService.findAll(); 
+}
 }

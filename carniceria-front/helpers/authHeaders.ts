@@ -22,7 +22,7 @@ export const getUserInfo = async () => {
       nombre_usuario: string;
       rol: string | string[];
     };
-
+    console.log("✅ Token decodificado:", decoded);
     return {
       nombre_usuario: decoded.nombre_usuario,
       userRoles: Array.isArray(decoded.rol) ? decoded.rol : [decoded.rol],

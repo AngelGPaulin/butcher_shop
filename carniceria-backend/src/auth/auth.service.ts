@@ -84,4 +84,10 @@ export class AuthService {
 
     return this.userRepository.save(updated);
   }
+  async findAll() {
+  return this.userRepository.find({
+    select: ['userId', 'nombre', 'apellido', 'nombre_usuario', 'rol'],
+  });
+}
+
 }
