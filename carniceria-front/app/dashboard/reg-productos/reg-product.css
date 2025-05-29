@@ -75,3 +75,15 @@
   color: white;
 }
 
+.radio-group {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem; /* espacio entre botones */
+  margin-bottom: 1rem;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem; /* espacio entre el botón y el texto */
+}

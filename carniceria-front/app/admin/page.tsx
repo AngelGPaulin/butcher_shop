@@ -128,6 +128,32 @@ const PrincipalAdmin = () => {
     router.push(path);
   };
 
+  // Acciones para editar y eliminar producto
+  const handleEditar = (productId) => {
+    router.push(`/dashboard/editar-producto/${productId}`);
+  };
+
+  const handleEliminar = async (productId, nombre) => {
+    if (!confirm(`¿Eliminar producto ${nombre}? Esta acción no se puede deshacer.`)) return;
+
+    try {
+      const headers = await authHeaders();
+      const res = await fetch(`${API_URL}/products/${productId}`, {
+        method: "DELETE",
+        headers,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${await res.text()}`);
+      }
+
+      // Refrescar productos después de eliminar
+      consultarProductos();
+    } catch (err) {
+      alert("Error al eliminar producto: " + err.message);
+    }
+  };
+
   return (
     <div className="admin-container">
       <div className="admin-header-4">
@@ -207,15 +233,14 @@ const PrincipalAdmin = () => {
           <div className="admin-report-box">
             <button
               className="btn-report"
-              onClick={() => handleRedirect("/reportes")}
+              onClick={() => handleRedirect("/dashboard/reports")}
             >
               Generar reportes
             </button>
 
             <button
               className="btn-repVenta"
-              onClick={() => handleRedirect("/ventas")}
-            >
+              onClick={() => handleRedirect("/dashboard/consulta-ventas")}>
               Consultar ventas
             </button>
           </div>
@@ -231,10 +256,10 @@ const PrincipalAdmin = () => {
             <tr>
               <th>Sucursal</th>
               <th>Producto</th>
-              <th>Precio por KG</th>
-              <th>Unidad</th>
+              <th>Precio (KG)</th>
               <th>Stock</th>
               <th>Merma</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -246,21 +271,35 @@ const PrincipalAdmin = () => {
                     ?.nombre ||
                   producto.locationId ||
                   "-";
-                const nombre = producto.nombre || producto.productName || "-";
-                const precio = producto.precioPorKg || producto.pricePerKg || 0;
-                const unidad = producto.unidadMedida || producto.unit || "KG";
-                const stock =
-                  producto.stockActual || producto.currentStock || 0;
+
+                const nombre = producto.nombre || "-";
+                const precio = producto.precio_por_kg || 0;
+                const stock = producto.stock_actual || 0;
                 const merma = formatMerma(producto.merma || producto.waste);
 
                 return (
-                  <tr key={producto.id || producto._id}>
+                  <tr key={producto.productId}>
                     <td>{sucursalNombre}</td>
                     <td>{nombre}</td>
                     <td>${precio.toFixed(2)}</td>
-                    <td>{unidad}</td>
                     <td>{stock}</td>
                     <td>{merma}</td>
+                    <td>
+                      <button
+                        onClick={() => handleEditar(producto.productId)}
+                        className="btn-accion editar"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleEliminar(producto.productId, nombre)
+                        }
+                        className="btn-accion eliminar"
+                      >
+                        Eliminar
+                      </button>
+                    </td>
                   </tr>
                 );
               })
@@ -276,9 +315,9 @@ const PrincipalAdmin = () => {
           </tbody>
         </table>
 
+        {/* Total de Merma */}
         <div className="admin-total">
-          <span>Total merma:</span>
-          <input type="text" readOnly value={`${totalMerma.toFixed(2)}%`} />
+          <span>Total Merma:</span> {totalMerma.toFixed(2)}%
         </div>
       </div>
     </div>
