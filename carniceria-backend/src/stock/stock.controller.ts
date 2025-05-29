@@ -65,5 +65,15 @@ import {
     remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
       return this.stockService.remove(id);
     }
+    @ApiOperation({ summary: 'Obtener stock actual por nombre y sucursal' })
+    @Auth(ROLES.ADMIN, ROLES.EMPLOYEE)
+    @Get('stock-by-name/:nombre/:locationId')
+    getStockByNombreYLocation(
+      @Param('nombre') nombre: string,
+      @Param('locationId') locationId: string,
+    ) {
+      return this.stockService.getStockByNombreYLocation(nombre, locationId);
+    }
+
   }
   

@@ -77,4 +77,53 @@ export class StockService {
     await this.stockRepository.remove(movement);
     return { message: `Movimiento con ID ${id} eliminado` };
   }
+  async getStockByNombreYLocation(nombre: string, locationId: string) {
+  const product = await this.productRepository.findOne({ where: { nombre } });
+  if (!product) {
+    throw new NotFoundException('Producto no encontrado');
+  }
+
+  const location = await this.locationRepository.findOne({
+    where: { locationId },
+  });
+  if (!location) {
+    throw new NotFoundException('Sucursal no encontrada');
+  }
+
+  const result = await this.stockRepository
+    .createQueryBuilder('stock')
+    .select('SUM(CASE WHEN stock.tipo = \'entrada\' THEN stock.peso_kg ELSE -stock.peso_kg END)', 'stock_actual')
+    .where('stock.producto = :productId', { productId: product.productId })
+    .andWhere('stock.location = :locationId', { locationId })
+    .getRawOne();
+
+  return {
+    stock_actual: parseFloat(result.stock_actual) || 0,
+  };
+}
+async getStockByProductName(nombre: string, locationId: string) {
+  const product = await this.productRepository.findOne({ where: { nombre } });
+  if (!product) throw new NotFoundException('Producto no encontrado');
+
+  const location = await this.locationRepository.findOne({ where: { locationId } });
+  if (!location) throw new NotFoundException('Sucursal no encontrada');
+
+  const stockMovements = await this.stockRepository.find({
+    where: {
+      producto: { productId: product.productId },
+      location: { locationId },
+    },
+  });
+
+  const totalStock = stockMovements.reduce((sum, m) => {
+    return m.tipo === 'entrada'
+      ? sum + m.peso_kg
+      : sum - m.peso_kg;
+  }, 0);
+
+  return { stock_actual: totalStock };
+}
+
+
+
 }

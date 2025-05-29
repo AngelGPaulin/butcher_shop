@@ -36,6 +36,7 @@ export default function LoginPage() {
       if (res.ok) {
         const result = await res.json();
         console.log("✅ Login success:", result);
+        localStorage.setItem("usuario", JSON.stringify(result));
 
         // Redirección según el rol
         if (result.rol === "Admin") {
