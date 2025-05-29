@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString, MinLength, IsUUID } from 'class-validator';
 import { ROLES } from '../constants/roles.constants';
+import { IsPhoneNumber } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'Carlos' })
@@ -12,7 +13,7 @@ export class CreateUserDto {
   apellido: string;
 
   @ApiProperty({ example: '1234567890' })
-  @IsString()
+  @IsPhoneNumber('MX', { message: 'Número de teléfono inválido para México' })
   telefono: string;
 
   @ApiProperty({ example: 'Calle Falsa 123' })

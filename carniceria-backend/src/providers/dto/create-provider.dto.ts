@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+import { IsPhoneNumber } from 'class-validator';
+
 
 export class CreateProviderDto {
   @ApiProperty({
@@ -31,6 +33,7 @@ export class CreateProviderDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsPhoneNumber('MX', { message: 'Número de teléfono inválido para México' })
+  
   telefono?: string;
 }
