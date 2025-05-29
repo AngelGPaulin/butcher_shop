@@ -65,13 +65,13 @@ const RegUsua = () => {
         apellido: form.apellido,
         telefono: form.telefono,
         direccion: form.direccion,
-        nombre_usuario: form.username, // campo esperado por el backend
-        contrasena: form.password, // campo esperado por el backend
+        nombre_usuario: form.nombre_usuario, // campo esperado por el backend
+        contrasena: form.contrasena, // campo esperado por el backend
         rol: form.rol,
-        location: form.nomSucursal, // debe coincidir con la relación ManyToOne
+        location: form.locationId, // debe coincidir con la relación ManyToOne
       };
 
-      const res = await fetch(`${API_URL}/auth/register`, {
+      const res = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: {
           ...headers,
