@@ -65,6 +65,31 @@
   font-size: 16px;
 }
 
+.btn-crear {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: auto;
+}
+.btn-crear {
+  background-color: #000000;
+  color: white;
+}
+.btn-delete {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.btn-delete {
+  background-color: #b71c1c;
+  color: white;
+}
+
+
 .btn-submit {
   background-color: #000000;
   color: white;
@@ -86,4 +111,17 @@
   display: flex;
   align-items: center;
   gap: 0.25rem; /* espacio entre el botón y el texto */
+}
+
+
+.regProd-logo-box {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: center;
+}
+
+.regProd-logo {
+  width: 200px;
+  margin-right: 24px;
 }
