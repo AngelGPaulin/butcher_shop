@@ -1,4 +1,25 @@
-# PostgreSQL internal files - should not be versioned
-carniceria-backend/postgres-carniceria/global/
-carniceria-backend/postgres-carniceria/pg_wal/
-carniceria-backend/postgres-carniceria/pg_xact/
+# Node.js
+node_modules/
+dist/
+build/
+.next/
+
+# Entornos
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor config
+.vscode/
+*.swp
+
+# PostgreSQL local (evitar subir DB en vivo)
+carniceria-backend/postgres-carniceria/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
