@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { API_URL } from "@/constants";
 import { authHeaders } from "@/helpers/authHeaders";
 import dayjs from "dayjs";
+import "./reports.css";
 
 const getLocalDate = () => {
   const localDate = new Date();
@@ -96,116 +97,116 @@ export default function ReportesAdminClient() {
   };
 
   return (
-    <div style={{ padding: "1rem" }}>
+  <div className="report-container">
+    <div className="report-header">
+      <div className="genReport-logo-box">
+        <img src="/logo.png" alt="Logo" className="genReport-logo" />
+      </div>
       <h1>Reportes de Ventas</h1>
-      <div
-        style={{
-          display: "flex",
-          gap: "0.5rem",
-          marginBottom: "1rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <button onClick={() => setRango("hoy")}>Hoy</button>
-        <button onClick={() => setRango("semana")}>Esta Semana</button>
-        <button onClick={() => setRango("mes")}>Este Mes</button>
-        <button onClick={() => setRango("año")}>Este Año</button>
+    </div>
+
+    <div className="report-range-buttons">
+      <button className="report-range-button" onClick={() => setRango("hoy")}>Hoy</button>
+      <button className="report-range-button" onClick={() => setRango("semana")}>Esta Semana</button>
+      <button className="report-range-button" onClick={() => setRango("mes")}>Este Mes</button>
+      <button className="report-range-button" onClick={() => setRango("año")}>Este Año</button>
+    </div>
+
+    <div className="report-controls">
+      <div className="report-control-group">
+        <label>Fecha inicio:</label>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.5rem",
-          maxWidth: 400,
-        }}
-      >
-        <label>
-          Fecha inicio:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </label>
-        <label>
-          Fecha fin:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </label>
-        <label>
-          Sucursal:
-          <select
-            value={locationId}
-            onChange={(e) => setLocationId(e.target.value)}
-          >
-            <option value="">Todas</option>
-            {locations.map((loc) => (
-              <option key={loc.locationId} value={loc.locationId}>
-                {loc.nombre}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Empleado:
-          <select value={userId} onChange={(e) => setUserId(e.target.value)}>
-            <option value="">Todos</option>
-            {employees.map((emp) => (
-              <option key={emp.userId} value={emp.userId}>
-                {emp.nombre} {emp.apellido}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={buscarReportes}>Buscar</button>
-          <button onClick={() => exportar("excel")}>Exportar Excel</button>
-          <button onClick={() => exportar("pdf")}>Exportar PDF</button>
-        </div>
+
+      <div className="report-control-group">
+        <label>Fecha fin:</label>
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
       </div>
-      <div style={{ marginTop: "1rem" }}>
-        {loading ? (
-          <p>Cargando...</p>
-        ) : reportData.length === 0 ? (
-          <p>No hay datos para los filtros seleccionados.</p>
-        ) : (
-          <table
-            border={1}
-            cellPadding={5}
-            style={{ marginTop: "1rem", width: "100%" }}
-          >
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Sucursal</th>
-                <th>Empleado</th>
-                <th>Total Ventas ($)</th>
-                <th>Total Kg</th>
-                <th>Total Items</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reportData.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{row.fecha}</td>
-                  <td>{row.location?.nombre || "-"}</td>
-                  <td>
-                    {row.employee
-                      ? `${row.employee.nombre} ${row.employee.apellido}`
-                      : "-"}
-                  </td>
-                  <td>{row.total_ventas}</td>
-                  <td>{row.total_kg}</td>
-                  <td>{row.total_items}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+
+      <div className="report-control-group">
+        <label>Sucursal:</label>
+        <select
+          value={locationId}
+          onChange={(e) => setLocationId(e.target.value)}
+        >
+          <option value="">Todas</option>
+          {locations.map((loc) => (
+            <option key={loc.locationId} value={loc.locationId}>
+              {loc.nombre}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="report-control-group">
+        <label>Empleado:</label>
+        <select value={userId} onChange={(e) => setUserId(e.target.value)}>
+          <option value="">Todos</option>
+          {employees.map((emp) => (
+            <option key={emp.userId} value={emp.userId}>
+              {emp.nombre} {emp.apellido}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="report-button-group">
+        <button className="report-button report-button-primary" onClick={buscarReportes}>
+          Buscar
+        </button>
+        <button className="report-button report-button-export" onClick={() => exportar("excel")}>
+          Exportar Excel
+        </button>
+        <button className="report-button report-button-export" onClick={() => exportar("pdf")}>
+          Exportar PDF
+        </button>
       </div>
     </div>
-  );
+
+    <div style={{ marginTop: "1rem" }}>
+      {loading ? (
+        <p className="report-message">Cargando...</p>
+      ) : reportData.length === 0 ? (
+        <p className="report-message">No hay datos para los filtros seleccionados.</p>
+      ) : (
+        <table className="report-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Sucursal</th>
+              <th>Empleado</th>
+              <th>Total Ventas ($)</th>
+              <th>Total Kg</th>
+              <th>Total Items</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reportData.map((row, idx) => (
+              <tr key={idx}>
+                <td>{row.fecha}</td>
+                <td>{row.location?.nombre || "-"}</td>
+                <td>
+                  {row.employee
+                    ? `${row.employee.nombre} ${row.employee.apellido}`
+                    : "-"}
+                </td>
+                <td>{row.total_ventas}</td>
+                <td>{row.total_kg}</td>
+                <td>{row.total_items}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  </div>
+);
 }
