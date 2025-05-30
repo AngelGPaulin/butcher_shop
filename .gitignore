@@ -1,4 +1,4 @@
-carniceria-backend/postgres-carniceria
-/postgres-carniceria/
-*.zip
-*.rar
+# PostgreSQL internal files - should not be versioned
+carniceria-backend/postgres-carniceria/global/
+carniceria-backend/postgres-carniceria/pg_wal/
+carniceria-backend/postgres-carniceria/pg_xact/

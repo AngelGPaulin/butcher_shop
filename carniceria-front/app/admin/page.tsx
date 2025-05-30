@@ -1,62 +1,40 @@
 "use client";
 
-import Link from "next/link";
 import { API_URL } from "@/constants";
-import { Button, Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { authHeaders } from "@/helpers/authHeaders";
 import "./prin-admin.css";
 
+interface Sucursal {
+  locationId: string;
+  nombre: string;
+}
+
+interface Producto {
+  productId: string;
+  nombre: string;
+  precio_por_kg: number;
+  stock_actual: number;
+  locationId: string;
+  sucursal?: { nombre: string };
+}
+
 const PrincipalAdmin = () => {
-  const [sucursales, setSucursales] = useState([]);
-  const [productos, setProductos] = useState([]);
-  const [filtros, setFiltros] = useState({
-    sucursal: "todas",
-    tipoCarne: "todas",
-  });
+  const [sucursales, setSucursales] = useState<Sucursal[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [sucursalSeleccionada, setSucursalSeleccionada] = useState("todas");
+  const [nombreProducto, setNombreProducto] = useState("");
   const [loading, setLoading] = useState({
     sucursales: true,
     productos: false,
   });
-  const [error, setError] = useState(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [totalMerma, setTotalMerma] = useState(0);
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // Obtener sucursales al cargar el componente
-  useEffect(() => {
-    const fetchSucursales = async () => {
-      try {
-        const headers = await authHeaders();
-        const res = await fetch(`${API_URL}/locations`, { headers });
-
-        if (!res.ok) {
-          throw new Error(`Error ${res.status}: ${res.statusText}`);
-        }
-
-        const data = await res.json();
-        setSucursales(data);
-      } catch (err) {
-        console.error("Error al cargar sucursales:", err);
-        setError("No se pudieron cargar las sucursales");
-      } finally {
-        setLoading((prev) => ({ ...prev, sucursales: false }));
-      }
-    };
-
-    fetchSucursales();
-  }, []);
-
-  // Manejar cambios en los filtros
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFiltros((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Consultar productos con filtros
   const consultarProductos = async () => {
     setLoading((prev) => ({ ...prev, productos: true }));
     setError(null);
@@ -65,50 +43,26 @@ const PrincipalAdmin = () => {
     try {
       const headers = await authHeaders();
       let url = `${API_URL}/products`;
-      const params = new URLSearchParams();
 
-      if (filtros.sucursal !== "todas") {
-        params.append("locationId", filtros.sucursal);
-      }
-
-      if (filtros.tipoCarne !== "todas") {
-        params.append("type", filtros.tipoCarne);
-      }
-
-      if (params.toString()) {
-        url += `?${params.toString()}`;
+      if (sucursalSeleccionada !== "todas") {
+        url += `?locationId=${sucursalSeleccionada}`;
       }
 
       const res = await fetch(url, { headers });
 
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}: ${await res.text()}`);
-      }
+      if (!res.ok) throw new Error(`Error ${res.status}: ${await res.text()}`);
 
-      const data = await res.json();
+      const data: Producto[] = await res.json();
       setProductos(data);
 
-      // Calcular total de merma
-      if (data && data.length > 0) {
-        const sumaMerma = data.reduce((total, producto) => {
-          let mermaValue = 0;
-          const merma = producto.merma || producto.waste || "0";
+      const sumaMerma = data.reduce((total, producto) => {
+        const stock = Number(producto.stock_actual) || 0;
+        const mermaKg = stock * 0.2;
+        return total + mermaKg;
+      }, 0);
 
-          // Extraer números incluyendo decimales
-          const numericValue = parseFloat(
-            merma.toString().replace(/[^0-9.]/g, "")
-          );
-
-          if (!isNaN(numericValue)) {
-            mermaValue = numericValue;
-          }
-
-          return total + mermaValue;
-        }, 0);
-
-        setTotalMerma(sumaMerma);
-      }
-    } catch (err) {
+      setTotalMerma(sumaMerma);
+    } catch (err: any) {
       console.error("Error al consultar productos:", err);
       setError(err.message);
     } finally {
@@ -116,25 +70,51 @@ const PrincipalAdmin = () => {
     }
   };
 
-  // Formatear merma para mostrar
-  const formatMerma = (merma) => {
-    if (typeof merma === "number") return `${merma}%`;
-    if (typeof merma === "string" && merma.includes("%")) return merma;
-    return `${merma || "0"}%`;
-  };
+  useEffect(() => {
+    const fetchSucursales = async () => {
+      try {
+        const headers = await authHeaders();
+        const res = await fetch(`${API_URL}/locations`, { headers });
 
-  // Redirección a otras páginas
-  const handleRedirect = (path) => {
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+
+        const data: Sucursal[] = await res.json();
+        setSucursales(data);
+
+        if (data.length > 0) {
+          await consultarProductos();
+        }
+
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 300);
+      } catch (err) {
+        console.error("Error al cargar sucursales:", err);
+        setError("No se pudieron cargar las sucursales");
+      } finally {
+        setLoading((prev) => ({ ...prev, sucursales: false }));
+        setIsInitialLoading(false);
+      }
+    };
+
+    fetchSucursales();
+  }, []);
+
+  const handleRedirect = (path: string) => {
     router.push(path);
   };
 
-  // Acciones para editar y eliminar producto
-  const handleEditar = (productId) => {
+  const handleEditar = (productId: string) => {
     router.push(`/dashboard/editar-producto/${productId}`);
   };
 
-  const handleEliminar = async (productId, nombre) => {
-    if (!confirm(`¿Eliminar producto ${nombre}? Esta acción no se puede deshacer.`)) return;
+  const handleEliminar = async (productId: string, nombre: string) => {
+    if (
+      !confirm(
+        `¿Eliminar producto ${nombre}? Esta acción no se puede deshacer.`
+      )
+    )
+      return;
 
     try {
       const headers = await authHeaders();
@@ -147,180 +127,181 @@ const PrincipalAdmin = () => {
         throw new Error(`Error ${res.status}: ${await res.text()}`);
       }
 
-      // Refrescar productos después de eliminar
       consultarProductos();
-    } catch (err) {
+    } catch (err: any) {
       alert("Error al eliminar producto: " + err.message);
     }
   };
 
   return (
-    <div className="admin-container">
-      <div className="admin-header-4">
-        <div className="admin-logo-box">
-          <img src="/logo.png" alt="Logo" className="admin-logo" />
+    <>
+      {isInitialLoading && (
+        <div className="loading-overlay">
+          <img src="/logo.png" alt="Logo" className="loading-logo" />
+          <div className="spinner" />
+          <p className="loading-text">Cargando la aplicación...</p>
         </div>
+      )}
 
-        <div className="admin-header-right">
-          {/* Sección de Filtros */}
-          <div className="admin-filters-box">
-            <div className="filter-group">
-              <label>Sucursal:</label>
-              <select
-                name="sucursal"
-                value={filtros.sucursal}
-                onChange={handleFilterChange}
-                disabled={loading.sucursales}
-              >
-                <option value="todas">Todas</option>
-                {sucursales.map((suc) => (
-                  <option key={suc.locationId} value={suc.locationId}>
-                    {suc.nombre}
-                  </option>
-                ))}
-              </select>
-              {loading.sucursales && (
-                <span className="loading-text">Cargando sucursales...</span>
-              )}
+      <div className="admin-container">
+        <div className="admin-header-4">
+          <div className="admin-logo-box">
+            <img src="/logo.png" alt="Logo" className="admin-logo" />
+          </div>
+
+          <div className="admin-header-right">
+            <div className="admin-filters-box">
+              <div className="filter-group">
+                <label>Sucursal:</label>
+                <select
+                  name="sucursal"
+                  value={sucursalSeleccionada}
+                  onChange={(e) => {
+                    setSucursalSeleccionada(e.target.value);
+                    consultarProductos();
+                  }}
+                  disabled={loading.sucursales}
+                >
+                  <option value="todas">Todas</option>
+                  {sucursales.map((suc) => (
+                    <option key={suc.locationId} value={suc.locationId}>
+                      {suc.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Producto:</label>
+                <input
+                  type="text"
+                  name="nombreProducto"
+                  placeholder="Buscar producto por nombre..."
+                  value={nombreProducto}
+                  onChange={(e) => setNombreProducto(e.target.value)}
+                  autoComplete="off"
+                  ref={inputRef}
+                />
+              </div>
             </div>
 
-            <div className="filter-group">
-              <label>Tipo de carne:</label>
-              <select
-                name="tipoCarne"
-                value={filtros.tipoCarne}
-                onChange={handleFilterChange}
+            <div className="admin-actions-box">
+              <button
+                className="btn-action"
+                onClick={() => handleRedirect("/reg-employee")}
               >
-                <option value="todas">Todas</option>
-                <option value="res">Res</option>
-                <option value="cerdo">Cerdo</option>
-                <option value="pollo">Pollo</option>
-                <option value="cordero">Cordero</option>
-              </select>
+                Registrar empleado
+              </button>
+
+              <button
+                className="btn-action"
+                onClick={() => handleRedirect("/dashboard/reg-productos")}
+              >
+                Registrar Productos
+              </button>
             </div>
 
-            <button
-              className="btn-consultar"
-              onClick={consultarProductos}
-              disabled={loading.productos || loading.sucursales}
-            >
-              {loading.productos ? (
-                <span className="loading-spinner"></span>
-              ) : (
-                "Consultar"
-              )}
-            </button>
-          </div>
+            <div className="admin-report-box">
+              <button
+                className="btn-report"
+                onClick={() => handleRedirect("/dashboard/reports")}
+              >
+                Generar reportes
+              </button>
 
-          {/* Sección de Acciones */}
-          <div className="admin-actions-box">
-            <button
-              className="btn-action"
-              onClick={() => handleRedirect("/reg-employee")}
-            >
-              Registrar empleado
-            </button>
-
-            <button
-              className="btn-action"
-              onClick={() => handleRedirect("/dashboard/reg-productos")}
-            >
-              Registrar Productos
-            </button>
-          </div>
-
-          {/* Sección de Reportes */}
-          <div className="admin-report-box">
-            <button
-              className="btn-report"
-              onClick={() => handleRedirect("/dashboard/reports")}
-            >
-              Generar reportes
-            </button>
-
-            <button
-              className="btn-repVenta"
-              onClick={() => handleRedirect("/dashboard/consulta-ventas")}>
-              Consultar ventas
-            </button>
+              <button
+                className="btn-repVenta"
+                onClick={() => handleRedirect("/dashboard/consulta-ventas")}
+              >
+                Consultar ventas
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Tabla de resultados */}
-      <div className="admin-table-container">
-        {error && <div className="error-message">Error: {error}</div>}
+        <div className="admin-table-container">
+          {error && <div className="error-message">Error: {error}</div>}
 
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Sucursal</th>
-              <th>Producto</th>
-              <th>Precio (KG)</th>
-              <th>Stock</th>
-              <th>Merma</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productos.length > 0 ? (
-              productos.map((producto) => {
-                const sucursalNombre =
-                  producto.sucursal?.nombre ||
-                  sucursales.find((s) => s.locationId === producto.locationId)
-                    ?.nombre ||
-                  producto.locationId ||
-                  "-";
-
-                const nombre = producto.nombre || "-";
-                const precio = producto.precio_por_kg || 0;
-                const stock = producto.stock_actual || 0;
-                const merma = formatMerma(producto.merma || producto.waste);
-
-                return (
-                  <tr key={producto.productId}>
-                    <td>{sucursalNombre}</td>
-                    <td>{nombre}</td>
-                    <td>${precio.toFixed(2)}</td>
-                    <td>{stock}</td>
-                    <td>{merma}</td>
-                    <td>
-                      <button
-                        onClick={() => handleEditar(producto.productId)}
-                        className="btn-accion editar"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleEliminar(producto.productId, nombre)
-                        }
-                        className="btn-accion eliminar"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
+          <table className="admin-table">
+            <thead>
               <tr>
-                <td colSpan="6" className="no-data">
-                  {loading.productos
-                    ? "Buscando productos..."
-                    : "No hay productos para mostrar"}
-                </td>
+                <th>Sucursal</th>
+                <th>Producto</th>
+                <th>Precio (KG)</th>
+                <th>Stock</th>
+                <th>Merma (kg)</th>
+                <th>Stock Neto</th>
+                <th>Acciones</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {productos
+                .filter(
+                  (producto) =>
+                    (sucursalSeleccionada === "todas" ||
+                      producto.locationId === sucursalSeleccionada) &&
+                    producto.nombre
+                      .toLowerCase()
+                      .includes(nombreProducto.toLowerCase())
+                )
+                .map((producto) => {
+                  const sucursalNombre =
+                    producto.sucursal?.nombre ||
+                    sucursales.find((s) => s.locationId === producto.locationId)
+                      ?.nombre ||
+                    producto.locationId ||
+                    "-";
 
-        {/* Total de Merma */}
-        <div className="admin-total">
-          <span>Total Merma:</span> {totalMerma.toFixed(2)}%
+                  const nombre = producto.nombre || "-";
+                  const precio = Number(producto.precio_por_kg) || 0;
+                  const stock = Number(producto.stock_actual) || 0;
+                  const mermaKg = stock * 0.2;
+                  const stockNeto = stock - mermaKg;
+
+                  return (
+                    <tr key={producto.productId}>
+                      <td>{sucursalNombre}</td>
+                      <td>{nombre}</td>
+                      <td>${precio.toFixed(2)}</td>
+                      <td>{stock}</td>
+                      <td>{mermaKg.toFixed(2)} kg</td>
+                      <td>{stockNeto.toFixed(2)} kg</td>
+                      <td>
+                        <button
+                          onClick={() => handleEditar(producto.productId)}
+                          className="btn-accion editar"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleEliminar(producto.productId, nombre)
+                          }
+                          className="btn-accion eliminar"
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+
+              {productos.length === 0 && !loading.productos && (
+                <tr>
+                  <td colSpan={7} className="no-data">
+                    No hay productos para mostrar
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          <div className="admin-total">
+            <span>Total Merma:</span> {totalMerma.toFixed(2)} kg
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
