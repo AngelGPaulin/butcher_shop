@@ -5,7 +5,7 @@ import { API_URL } from "@/constants";
 import "./reg-product.css";
 
 interface Producto {
-  productId: string;
+  productId?: string;
   nombre: string;
   precio_por_kg: number;
   unidad_medida: string;
@@ -91,13 +91,19 @@ export default function ProductoFormPage() {
   }, []);
 
   const getProductoData = () => {
-    return {
+    const data = {
       ...form,
       precio_por_kg: Number(form.precio_por_kg),
       stock_actual: Number(form.stock_actual),
       stock_minimo: Number(form.stock_minimo),
       disponible: true,
     };
+
+    if (!data.productId) {
+      delete data.productId;
+    }
+
+    return data;
   };
 
   const handleCrear = async (e: React.FormEvent) => {
