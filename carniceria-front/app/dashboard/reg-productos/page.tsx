@@ -200,6 +200,9 @@ export default function ProductoFormPage() {
   return (
     <div className="product-form-container">
       <div className="form-header">
+        <div className="regProd-logo-box">
+          <img src="/logo.png" alt="Logo" className="regProd-logo" />
+        </div>
         <h1>
           {modo === "crear"
             ? "Crear Producto"
@@ -222,7 +225,7 @@ export default function ProductoFormPage() {
             Crear Producto
           </button>
           <button
-            className="btn-cancel"
+            className="btn-crear"
             type="button"
             onClick={() => {
               setModo("actualizar");
