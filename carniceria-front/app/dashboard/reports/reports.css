@@ -1,6 +1,6 @@
 /* Estilos base del contenedor */
 .report-container {
-  max-width: 900px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -142,4 +142,31 @@
   text-align: center;
   margin: 20px 0;
   color: #555;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.btn-cancel {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: #b71c1c;
+  color: white;
+}
+/* Opcional: Para hacerlo responsivo en pantallas pequeñas */
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .btn-cancel {
+    width: 80%;
+    max-width: 200px;
+  }
 }

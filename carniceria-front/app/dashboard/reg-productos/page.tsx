@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "@/constants";
 import "./reg-product.css";
+import { useRouter } from "next/navigation";
 
 interface Producto {
   productId?: string;
@@ -23,6 +24,9 @@ export default function ProductoFormPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [sucursales, setSucursales] = useState<any[]>([]);
   const [proveedores, setProveedores] = useState<any[]>([]);
+  const router = useRouter();
+  const handleRedirect = (path: string) => { //funcion para redirigir a otra ruta
+  router.push(path);};
 
   const [form, setForm] = useState<Producto>({
     productId: "",
@@ -387,7 +391,7 @@ export default function ProductoFormPage() {
               ? "Actualizar"
               : "Eliminar"}
           </button>
-          <button className="btn-cancel" type="reset" onClick={resetForm}>
+          <button type="button" className="btn-cancel" onClick={() => handleRedirect("/admin")}>
             Cancelar
           </button>
         </div>

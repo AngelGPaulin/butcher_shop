@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { API_URL } from "@/constants";
 import { authHeaders } from "@/helpers/authHeaders";
 import "./reg-usu.css";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const initialState = {
   nombre: "",
@@ -14,16 +14,17 @@ const initialState = {
   nombre_usuario: "",
   contrasena: "",
   rol: "Employee",
-  locationId: "", //sucursal seleccionada
+  locationId: "",
 };
 
 const RegUsua = () => {
+  const router = useRouter();
   const [form, setForm] = useState(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [sucursales, setSucursales] = useState<
     { locationId: string; nombre: string }[]
   >([]);
-  const [error, setError] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -35,8 +36,7 @@ const RegUsua = () => {
 
         const data = await res.json();
         setSucursales(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
         console.error("Error al cargar sucursales:", err);
       }
     };
@@ -52,23 +52,30 @@ const RegUsua = () => {
       ...prev,
       [name]: value,
     }));
+    // Limpiar error de username cuando se modifica
+    if (name === "nombre_usuario") {
+      setUsernameError(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setUsernameError(null);
+    
     try {
       const headers = await authHeaders();
 
+      // Asegúrate que estos nombres coincidan con los esperados por el backend
       const payload = {
         nombre: form.nombre,
         apellido: form.apellido,
         telefono: form.telefono,
         direccion: form.direccion,
-        nombre_usuario: form.nombre_usuario, // campo esperado por el backend
-        contrasena: form.contrasena, // campo esperado por el backend
+        nombre_usuario: form.nombre_usuario,
+        contrasena: form.contrasena,
         rol: form.rol,
-        location: form.locationId, // debe coincidir con la relación ManyToOne
+        locationId: form.locationId, // Cambiado de "location" a "locationId"
       };
 
       const res = await fetch(`${API_URL}/auth/signup`, {
@@ -77,23 +84,26 @@ const RegUsua = () => {
           ...headers,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload), // Cambiado de form a payload
       });
+
+      const responseData = await res.json();
 
       if (res.ok) {
         alert("Usuario registrado correctamente");
         setForm(initialState);
-        // Redirigir después de registro exitoso
-        window.location.href = "/admin";
+        router.push("/admin");
       } else {
-        const errorData = await res.json();
-        alert(
-          `Error al registrar usuario: ${errorData.message || res.statusText}`
-        );
+        // Manejo específico para error de username duplicado
+        if (responseData.code === "23505") {
+          setUsernameError("Este nombre de usuario ya está en uso. Por favor elija otro.");
+        } else {
+          alert(`Error al registrar usuario: ${responseData.message || "Error desconocido"}`);
+        }
       }
     } catch (err) {
-      alert("Error de red al registrar usuario");
-      console.error(err);
+      console.error("Error de red:", err);
+      alert("Error de conexión al intentar registrar el usuario");
     } finally {
       setSubmitting(false);
     }
@@ -101,6 +111,7 @@ const RegUsua = () => {
 
   const handleCancel = () => {
     setForm(initialState);
+    router.push("/admin");
   };
 
   return (
@@ -108,8 +119,6 @@ const RegUsua = () => {
       <div className="logo-container">
         <img src="/logo.png" alt="Logo" className="logo" />
       </div>
-
-      {error && <div style={{ color: "red" }}>Error: {error}</div>}
 
       <div className="form-grid">
         <div className="form-group">
@@ -130,7 +139,9 @@ const RegUsua = () => {
             value={form.nombre_usuario}
             onChange={handleChange}
             required
+            className={usernameError ? "input-error" : ""}
           />
+          {usernameError && <div className="error-message">{usernameError}</div>}
         </div>
         <div className="form-group">
           <label>Apellido:</label>
@@ -202,11 +213,9 @@ const RegUsua = () => {
         <button type="submit" className="btn-submit" disabled={submitting}>
           {submitting ? "Registrando..." : "Registrar"}
         </button>
-        <Link href="/admin">
-          <button type="button" className="btn-cancel" onClick={handleCancel}>
-            Cancelar
-          </button>
-        </Link>
+        <button type="button" className="btn-cancel" onClick={handleCancel}>
+          Cancelar
+        </button>
       </div>
     </form>
   );

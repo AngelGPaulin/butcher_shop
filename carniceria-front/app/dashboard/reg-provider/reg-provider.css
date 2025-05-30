@@ -1,5 +1,6 @@
-.product-form-container {
-  max-width: 500px;
+/* reg-provider.css */
+.provider-form-container {
+  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -8,22 +9,30 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Estilos del encabezado */
 .form-header {
   text-align: center;
   margin-bottom: 20px;
 }
 
-.form-header .logo {
-  max-width: 200px;
-  margin-bottom: 10px;
+.regProv-logo-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.regProv-logo {
+  width: 200px;
 }
 
 .form-header h1 {
   color: #333;
   margin: 0;
+  font-size: 24px;
 }
 
-.product-form {
+/* Estilos del formulario */
+.provider-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -32,6 +41,7 @@
 .form-group {
   display: flex;
   flex-direction: column;
+  margin-bottom: 15px;
 }
 
 .form-group label {
@@ -41,49 +51,102 @@
 }
 
 .form-group input,
+.form-group textarea,
 .form-group select {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
-  background-color: #909ca4; /* fondo de color */
+  background-color: #909ca4; /* Mismo color que productos */
   color: #fff;
 }
 
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Estilos para la lista de proveedores */
+.provider-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+.provider-list-item {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.provider-list-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* Estilos para los botones */
 .form-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 25px;
+  gap: 15px;
 }
 
-.btn-submit,
+.btn-submit {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: #000000; /* Negro como en productos */
+  color: white;
+  flex: 1;
+}
+
 .btn-cancel {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  background-color: #b71c1c; /* Rojo como en productos */
+  color: white;
+  flex: 1;
 }
 
-.btn-submit {
+/* Modo específico botones */
+.btn-crear {
   background-color: #000000;
   color: white;
 }
 
-.btn-cancel {
+.btn-delete {
   background-color: #b71c1c;
   color: white;
 }
 
-.radio-group {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem; /* espacio entre botones */
-  margin-bottom: 1rem;
+/* Mensajes de error */
+.error-message {
+  color: #b71c1c;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
 }
 
-.radio-group label {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem; /* espacio entre el botón y el texto */
+/* Responsive */
+@media (max-width: 600px) {
+  .provider-form-container {
+    padding: 15px;
+    margin: 15px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn-submit, 
+  .btn-cancel {
+    width: 100%;
+  }
 }

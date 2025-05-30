@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { API_URL } from "@/constants";
 import { authHeaders } from "@/helpers/authHeaders";
 import dayjs from "dayjs";
+import { useRouter } from "next/navigation";
 import "./reports.css";
+
 
 const getLocalDate = () => {
   const localDate = new Date();
@@ -13,6 +15,9 @@ const getLocalDate = () => {
 };
 
 export default function ReportesAdminClient() {
+  const router = useRouter();
+  const handleRedirect = (path: string) => { //funcion para redirigir a otra ruta
+    router.push(path);};
   const [startDate, setStartDate] = useState(getLocalDate);
   const [endDate, setEndDate] = useState(getLocalDate);
   const [locationId, setLocationId] = useState("");
@@ -169,7 +174,15 @@ export default function ReportesAdminClient() {
           Exportar PDF
         </button>
       </div>
+
+    <div className="form-actions">
+      <button type="button" className="btn-cancel" onClick={() => handleRedirect("/admin")}>
+        Cancelar
+      </button>
     </div>
+    </div>
+    
+    
 
     <div style={{ marginTop: "1rem" }}>
       {loading ? (

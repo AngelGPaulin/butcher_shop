@@ -32,6 +32,8 @@ const PrincipalAdmin = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalMerma, setTotalMerma] = useState(0);
+  const [editingProduct, setEditingProduct] = useState<Producto | null>(null);
+  const [editedValues, setEditedValues] = useState<Partial<Producto>>({});
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -104,16 +106,55 @@ const PrincipalAdmin = () => {
     router.push(path);
   };
 
-  const handleEditar = (productId: string) => {
-    router.push(`/dashboard/editar-producto/${productId}`);
+  const handleModificar = (producto: Producto) => {
+    setEditingProduct(producto);
+    setEditedValues({
+      nombre: producto.nombre,
+      precio_por_kg: producto.precio_por_kg,
+      stock_actual: producto.stock_actual,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    setEditedValues({});
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingProduct) return;
+
+    try {
+      const headers = await authHeaders();
+      const res = await fetch(`${API_URL}/products/${editingProduct.productId}`, {
+        method: "PUT",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editedValues),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${await res.text()}`);
+      }
+
+      consultarProductos();
+      setEditingProduct(null);
+      setEditedValues({});
+    } catch (err: any) {
+      alert("Error al modificar producto: " + err.message);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof Producto) => {
+    setEditedValues(prev => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
   };
 
   const handleEliminar = async (productId: string, nombre: string) => {
-    if (
-      !confirm(
-        `¿Eliminar producto ${nombre}? Esta acción no se puede deshacer.`
-      )
-    )
+    if (!confirm(`¿Eliminar producto ${nombre}? Esta acción no se puede deshacer.`))
       return;
 
     try {
@@ -188,16 +229,20 @@ const PrincipalAdmin = () => {
             <div className="admin-actions-box">
               <button
                 className="btn-action"
-                onClick={() => handleRedirect("/reg-employee")}
-              >
+                onClick={() => handleRedirect("/reg-employee")}>
                 Registrar empleado
               </button>
 
               <button
                 className="btn-action"
-                onClick={() => handleRedirect("/dashboard/reg-productos")}
-              >
+                onClick={() => handleRedirect("/dashboard/reg-productos")}>
                 Registrar Productos
+              </button>
+
+              <button
+                className="btn-action"
+                onClick={() => handleRedirect("/dashboard/reg-provider")}>
+                Registrar Provedor
               </button>
             </div>
 
@@ -210,10 +255,10 @@ const PrincipalAdmin = () => {
               </button>
 
               <button
-                className="btn-repVenta"
-                onClick={() => handleRedirect("/dashboard/consulta-ventas")}
+                className="btn-genVenta"
+                onClick={() => handleRedirect("/dashboard")}
               >
-                Consultar ventas
+                Generar Venta
               </button>
             </div>
           </div>
@@ -252,6 +297,7 @@ const PrincipalAdmin = () => {
                     producto.locationId ||
                     "-";
 
+                  const isEditing = editingProduct?.productId === producto.productId;
                   const nombre = producto.nombre || "-";
                   const precio = Number(producto.precio_por_kg) || 0;
                   const stock = Number(producto.stock_actual) || 0;
@@ -261,26 +307,82 @@ const PrincipalAdmin = () => {
                   return (
                     <tr key={producto.productId}>
                       <td>{sucursalNombre}</td>
-                      <td>{nombre}</td>
-                      <td>${precio.toFixed(2)}</td>
-                      <td>{stock}</td>
+                      <td>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedValues.nombre || ""}
+                            onChange={(e) => handleInputChange(e, "nombre")}
+                            className="edit-input"
+                          />
+                        ) : (
+                          nombre
+                        )}
+                      </td>
+                      <td>
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editedValues.precio_por_kg || ""}
+                            onChange={(e) => handleInputChange(e, "precio_por_kg")}
+                            className="edit-input"
+                          />
+                        ) : (
+                          `$${precio.toFixed(2)}`
+                        )}
+                      </td>
+                      <td>
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editedValues.stock_actual || ""}
+                            onChange={(e) => handleInputChange(e, "stock_actual")}
+                            className="edit-input"
+                          />
+                        ) : (
+                          stock
+                        )}
+                      </td>
                       <td>{mermaKg.toFixed(2)} kg</td>
                       <td>{stockNeto.toFixed(2)} kg</td>
-                      <td>
-                        <button
-                          onClick={() => handleEditar(producto.productId)}
-                          className="btn-accion editar"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleEliminar(producto.productId, nombre)
-                          }
-                          className="btn-accion eliminar"
-                        >
-                          Eliminar
-                        </button>
+                      <td style={{ textAlign: "center" }}>
+                        {isEditing ? (
+                          <>
+                            <button
+                              onClick={handleSaveEdit}
+                              className="btn-accion-guardar"
+                              style={{ display: "inline-block" }}
+                            >
+                              <img src="/guardar.png" alt="Guardar" width="30" style={{ display: "block" }} />
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="btn-accion-cancelar"
+                              style={{ display: "inline-block", marginLeft: "30px" }}
+                            >
+                              <img src="/cancelar.png" alt="Cancelar" width="30" style={{ display: "block" }} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleModificar(producto)}
+                              className="btn-accion-modificar"
+                              style={{ display: "inline-block" }}
+                            >
+                              <img src="/modificar.png" alt="Modificar" width="30" style={{ display: "block" }} />
+                            </button>
+                            <button
+                              onClick={() => handleEliminar(producto.productId, nombre)}
+                              className="btn-accion-eliminar"
+                              style={{ display: "inline-block", marginLeft: "30px" }}
+                            >
+                              <img src="/eliminar.png" alt="Eliminar" width="30" style={{ display: "block" }} />
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   );
@@ -300,6 +402,11 @@ const PrincipalAdmin = () => {
             <span>Total Merma:</span> {totalMerma.toFixed(2)} kg
           </div>
         </div>
+      <div className="form-actions-cerrar">
+        <button type="button" className="btn-cerrar-sesion" onClick={() => handleRedirect("/login")}>
+        Cerrar sesión
+      </button>
+    </div>
       </div>
     </>
   );
