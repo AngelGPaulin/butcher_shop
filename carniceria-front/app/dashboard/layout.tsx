@@ -1,4 +1,4 @@
-import { CartProvider } from "./cart/CartContext";
+import { CartProvider } from "./tempo/CartContext";
 
 export default function DashboardLayout({
   children,

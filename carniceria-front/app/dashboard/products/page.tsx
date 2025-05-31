@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Product } from "@/entities";
 import { authHeaders } from "@/helpers/authHeaders";
 import { API_URL } from "@/constants";
-import { useCart } from "../cart/CartContext";
+import { useCart } from "../tempo/CartContext";
 
 export default function ProductsPage() {
   const { addItem } = useCart();

@@ -256,7 +256,7 @@ const PrincipalAdmin = () => {
 
               <button
                 className="btn-genVenta"
-                onClick={() => handleRedirect("/dashboard")}
+                onClick={() => handleRedirect("/dashboard/cart")}
               >
                 Generar Venta
               </button>
@@ -276,7 +276,7 @@ const PrincipalAdmin = () => {
                 <th>Stock</th>
                 <th>Merma (kg)</th>
                 <th>Stock Neto</th>
-                <th>Acciones</th>
+                {/*<th>Acciones</th>*/}
               </tr>
             </thead>
             <tbody>
@@ -347,7 +347,8 @@ const PrincipalAdmin = () => {
                       </td>
                       <td>{mermaKg.toFixed(2)} kg</td>
                       <td>{stockNeto.toFixed(2)} kg</td>
-                      <td style={{ textAlign: "center" }}>
+                      
+                      {/*<td style={{ textAlign: "center" }}>
                         {isEditing ? (
                           <>
                             <button
@@ -383,7 +384,7 @@ const PrincipalAdmin = () => {
                             </button>
                           </>
                         )}
-                      </td>
+                      </td>*/}
                     </tr>
                   );
                 })}

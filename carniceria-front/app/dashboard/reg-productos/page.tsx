@@ -207,13 +207,7 @@ export default function ProductoFormPage() {
         <div className="regProd-logo-box">
           <img src="/logo.png" alt="Logo" className="regProd-logo" />
         </div>
-        <h1>
-          {modo === "crear"
-            ? "Crear Producto"
-            : modo === "actualizar"
-            ? "Actualizar Producto"
-            : "Eliminar Producto"}
-        </h1>
+        
         <div
           className="form-actions"
           style={{ justifyContent: "center", marginBottom: "20px" }}
