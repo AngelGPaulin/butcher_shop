@@ -30,3 +30,4 @@ Thumbs.db
 *.rar
 carniceria-front.zip
 carniceria-backend/src/credentials/firebase-key.json
+carniceria-front\helpers\firebaseClient.ts
