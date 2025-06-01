@@ -8,6 +8,7 @@ build/
 .env
 .env.local
 
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
@@ -16,7 +17,7 @@ yarn-error.log*
 # Editor config
 .vscode/
 *.swp
-
+firebase-key.json
 # PostgreSQL local (evitar subir DB en vivo)
 carniceria-backend/postgres-carniceria/
 
@@ -28,3 +29,4 @@ Thumbs.db
 *.zip
 *.rar
 carniceria-front.zip
+carniceria-backend/src/credentials/firebase-key.json

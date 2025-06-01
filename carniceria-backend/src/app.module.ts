@@ -7,8 +7,10 @@ import { LocationsModule } from './locations/locations.module';
 import { SalesModule } from './sales/sales.module';
 import { StockModule } from './stock/stock.module';
 import { SalesHistoryModule } from './sales-history/sales-history.module';
-import { ProductsModule } from './products/products.module'; 
+import { ProductsModule } from './products/products.module';
 import { ProvidersModule } from './providers/providers.module';
+
+import { FirebaseService } from './shared/firebase.service'; // 
 
 @Module({
   imports: [
@@ -42,5 +44,7 @@ import { ProvidersModule } from './providers/providers.module';
     ProductsModule,
     ProvidersModule,
   ],
+  providers: [FirebaseService], 
+  exports: [FirebaseService],   
 })
 export class AppModule {}

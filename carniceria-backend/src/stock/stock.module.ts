@@ -6,10 +6,11 @@ import { StockMovement } from './entities/stock-movement.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Location } from 'src/locations/entities/location.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([StockMovement, Product, Location, User]),
+    TypeOrmModule.forFeature([StockMovement, Product, Location, User]),SharedModule,
   ],
   controllers: [StockController],
   providers: [StockService],

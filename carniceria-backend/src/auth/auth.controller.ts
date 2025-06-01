@@ -20,8 +20,12 @@ import { TOKEN_NAME } from './constants/jwt.constants';
 import { Cookies } from './decorators/cookies.decorator';
 import { Auth } from './decorators/auth.decorator';
 import { ROLES } from 'src/auth/constants/roles.constants';
+import { IsEmail, IsString } from 'class-validator';
 
-
+class FirebaseLoginDto {
+  @IsEmail()
+  email: string;
+}
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -66,5 +70,31 @@ export class AuthController {
   @ApiOperation({ summary: 'Listar todos los usuarios' })
   findAllUsers() {
     return this.authService.findAll(); 
+
 }
+@Post('firebase-login')
+async firebaseLogin(
+  @Body('email') email: string,
+  @Res({ passthrough: true }) res: Response,
+  @Cookies() cookies: any,
+) {
+  console.log('🔥 Firebase login recibido para:', email);
+  console.log('➡️ Cookies actuales del cliente:', cookies);
+
+  const result = await this.authService.loginWithFirebase(email);
+
+  console.log('✅ Usuario verificado en BD:', result);
+
+  res.cookie(TOKEN_NAME, result[TOKEN_NAME], {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  });
+
+  console.log('🍪 Cookie enviada al frontend con token:', result[TOKEN_NAME]);
+
+  return result.user;
+}
+
 }

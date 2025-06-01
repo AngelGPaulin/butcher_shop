@@ -40,10 +40,15 @@ export class User {
   @ApiProperty({ example: 'hashedpassword123' })
   @Column('text')
   contrasena: string;
+  @ApiProperty({ example: 'example@gmail.com'})
+  @Column({ nullable: true})
+  email: string;
+
 
   @ApiProperty({ enum: ROLES, example: ROLES.EMPLOYEE })
   @Column({ type: 'enum', enum: ROLES })
   rol: ROLES;
+  
 
   @ApiProperty({ type: () => Location })
   @ManyToOne(() => Location, (location) => location.empleados, { eager: true })

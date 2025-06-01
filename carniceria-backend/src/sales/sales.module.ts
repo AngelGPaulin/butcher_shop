@@ -8,6 +8,7 @@ import { SaleItem } from './entities/sale-item.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Location } from 'src/locations/entities/location.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { User } from 'src/auth/entities/user.entity';
       Product,
       Location,
       User,
-    ]),
+    ]),SharedModule
   ],
   controllers: [SalesController],
   providers: [SalesService],

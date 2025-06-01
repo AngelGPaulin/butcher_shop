@@ -7,6 +7,7 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { Location } from 'src/locations/entities/location.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { FirebaseService } from '../shared/firebase.service'; // ✅ Importar
 
 @Injectable()
 export class SalesService {
@@ -25,6 +26,8 @@ export class SalesService {
 
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+
+    private readonly firebaseService: FirebaseService, // ✅ Inyectar
   ) {}
 
   async create(createSaleDto: CreateSaleDto) {
@@ -38,15 +41,10 @@ export class SalesService {
     });
     if (!location) throw new NotFoundException('Sucursal no encontrada');
 
-    const sale = this.saleRepository.create({
-      employee,
-      location,
-    });
-
+    const sale = this.saleRepository.create({ employee, location });
     const savedSale = await this.saleRepository.save(sale);
 
     const items: SaleItem[] = [];
-
     for (const itemDto of createSaleDto.items) {
       const product = await this.productRepository.findOne({
         where: { productId: itemDto.productId },
@@ -66,13 +64,24 @@ export class SalesService {
 
     await this.saleItemRepository.save(items);
 
-    return this.saleRepository.findOne({
+    const final = await this.saleRepository.findOne({
       where: { saleId: savedSale.saleId },
       relations: ['employee', 'location', 'items', 'items.product'],
     });
+
+    // ✅ Emitir evento en tiempo real
+    await this.firebaseService.broadcast('sales_updates', {
+      saleId: final?.saleId,
+      location: final?.location?.nombre || '',
+      employee: final?.employee?.nombre || '',
+      total: final?.items.reduce((sum, i) => sum + i.subtotal, 0),
+      timestamp: new Date().toISOString(),
+    });
+
+    return final;
   }
 
-  findAll() {
+  async findAll() {
     return this.saleRepository.find({
       where: { cancelada: false },
       relations: ['employee', 'location', 'items', 'items.product'],
@@ -98,6 +107,13 @@ export class SalesService {
     sale.cancelada = true;
     await this.saleRepository.save(sale);
 
+    // ✅ Notificar cancelación
+    await this.firebaseService.broadcast('sales_cancels', {
+      saleId: id,
+      cancelada: true,
+      timestamp: new Date().toISOString(),
+    });
+
     return {
       message: `Venta con ID ${id} cancelada.`,
     };
@@ -106,6 +122,12 @@ export class SalesService {
   async remove(id: string) {
     const sale = await this.findOne(id);
     await this.saleRepository.remove(sale);
+
+    // ✅ Notificar eliminación
+    await this.firebaseService.broadcast('sales_deletes', {
+      saleId: id,
+    });
+
     return {
       message: `Venta con ID ${id} eliminada`,
     };

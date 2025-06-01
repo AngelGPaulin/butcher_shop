@@ -4,20 +4,28 @@ import { Repository } from 'typeorm';
 import { Location } from './entities/location.entity';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
+import { FirebaseService } from '../shared/firebase.service'; // ✅ Agregado
 
 @Injectable()
 export class LocationsService {
   constructor(
     @InjectRepository(Location)
     private readonly locationRepository: Repository<Location>,
+
+    private readonly firebaseService: FirebaseService, // ✅ Inyectado
   ) {}
 
-  create(createLocationDto: CreateLocationDto) {
+  async create(createLocationDto: CreateLocationDto) {
     const location = this.locationRepository.create(createLocationDto);
-    return this.locationRepository.save(location);
+    const saved = await this.locationRepository.save(location);
+
+    // ✅ Emitir a Firebase
+    await this.firebaseService.broadcast('locations_updates', saved);
+
+    return saved;
   }
 
-  findAll() {
+  async findAll() {
     return this.locationRepository.find({
       relations: ['empleados'],
     });
@@ -41,12 +49,20 @@ export class LocationsService {
 
     if (!location) throw new NotFoundException('Location not found');
 
-    return this.locationRepository.save(location);
+    const saved = await this.locationRepository.save(location);
+
+    // ✅ Emitir actualización
+    await this.firebaseService.broadcast('locations_updates', saved);
+
+    return saved;
   }
 
   async remove(id: string) {
     const location = await this.findOne(id);
     await this.locationRepository.remove(location);
+
+    // ✅ Emitir eliminación
+    await this.firebaseService.broadcast('locations_deletes', { locationId: id });
 
     return {
       message: `Location with ID ${id} deleted`,

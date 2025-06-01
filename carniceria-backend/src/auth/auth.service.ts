@@ -15,6 +15,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ROLES } from './constants/roles.constants';
 import { TOKEN_NAME } from './constants/jwt.constants';
 
+import { FirebaseService } from '../shared/firebase.service';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -22,51 +24,68 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
 
     private readonly jwtService: JwtService,
+    private readonly firebaseService: FirebaseService,
   ) {}
 
   async registerUser(createUserDto: CreateUserDto) {
-    const { contrasena, locationId, ...rest } = createUserDto;
-
+    const { contrasena, locationId, email, ...rest } = createUserDto;
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
     const newUser = this.userRepository.create({
       ...rest,
+      email,
       contrasena: hashedPassword,
       location: { locationId },
     });
 
-    return this.userRepository.save(newUser);
-  }
+    const saved = await this.userRepository.save(newUser);
 
-  async loginUser(loginUserDto: LoginUserDto) {
-    const user = await this.userRepository.findOne({
-      where: { nombre_usuario: loginUserDto.nombre_usuario },
+    // ✅ Crear en Firebase Auth
+    await this.firebaseService.createFirebaseUser(email, contrasena);
+
+    // ✅ Firebase Firestore
+    await this.firebaseService.broadcast('users_updates', {
+      userId: saved.userId,
+      nombre_usuario: saved.nombre_usuario,
+      email: saved.email,
+      rol: saved.rol,
+      nombre: saved.nombre,
+      apellido: saved.apellido,
     });
 
-    if (!user) throw new UnauthorizedException('Usuario no encontrado');
-
-    const isPasswordValid = await bcrypt.compare(
-      loginUserDto.contrasena,
-      user.contrasena,
-    );
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Contraseña incorrecta');
-    }
-
-    const payload = {
-      userId: user.userId,
-      nombre_usuario: user.nombre_usuario,
-      rol: user.rol,
-    };
-
-    const token = this.jwtService.sign(payload);
-
-    return {
-      [TOKEN_NAME]: token,
-      user: payload,
-    };
+    return saved;
   }
+
+async loginUser(loginUserDto: LoginUserDto) {
+  const user = await this.userRepository.findOne({
+    where: { email: loginUserDto.email },
+  });
+
+  if (!user) throw new UnauthorizedException('Usuario no encontrado');
+
+  const isPasswordValid = await bcrypt.compare(
+    loginUserDto.contrasena,
+    user.contrasena,
+  );
+
+  if (!isPasswordValid) {
+    throw new UnauthorizedException('Contraseña incorrecta');
+  }
+
+  const payload = {
+    userId: user.userId,
+    email: user.email,
+    rol: user.rol,
+  };
+
+  const token = this.jwtService.sign(payload);
+
+  return {
+    [TOKEN_NAME]: token,
+    user: payload,
+  };
+}
+
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.contrasena) {
@@ -82,12 +101,45 @@ export class AuthService {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
 
-    return this.userRepository.save(updated);
+    const saved = await this.userRepository.save(updated);
+
+    await this.firebaseService.broadcast('users_updates', {
+      userId: saved.userId,
+      nombre_usuario: saved.nombre_usuario,
+      email: saved.email,
+      rol: saved.rol,
+      nombre: saved.nombre,
+      apellido: saved.apellido,
+    });
+
+    return saved;
   }
+
   async findAll() {
-  return this.userRepository.find({
-    select: ['userId', 'nombre', 'apellido', 'nombre_usuario', 'rol'],
+    return this.userRepository.find({
+      select: ['userId', 'nombre', 'apellido', 'nombre_usuario', 'email', 'rol'],
+    });
+  }
+
+async loginWithFirebase(email: string) {
+  const user = await this.userRepository.findOne({
+    where: { email },
   });
+
+  if (!user) throw new UnauthorizedException('Usuario no registrado en el sistema');
+
+  const payload = {
+    userId: user.userId,
+    nombre_usuario: user.nombre_usuario,
+    rol: user.rol,
+  };
+
+  const token = this.jwtService.sign(payload);
+
+  return {
+    [TOKEN_NAME]: token,
+    user: payload,
+  };
 }
 
 }

@@ -1,55 +1,69 @@
 "use client";
 
-import { API_URL } from "@/constants";
-import { Button, Input } from "@nextui-org/react";
-import Link from "next/link";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/helpers/firebaseClient";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { API_URL, TOKEN_NAME } from "@/constants";
 import "./login.css";
 
 export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
 
-    const formData = new FormData(e.currentTarget);
-    const authData = {
-      nombre_usuario: formData.get("nombre_usuario"),
-      contrasena: formData.get("contrasena"),
-    };
-    console.log("🔁 Enviando datos de login:", authData);
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email") as string;
+    const password = form.get("contrasena") as string;
+
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      console.log("✅ Login exitoso:", user.email);
+
+      // Llamar a backend para obtener token
+      const res = await fetch(`${API_URL}/auth/firebase-login`, {
         method: "POST",
-        body: JSON.stringify(authData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email }),
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
-
-      console.log("🔁 STATUS DE LOGIN:", res.status);
-
-      if (res.ok) {
-        const result = await res.json();
-        console.log("✅ Login success:", result);
-        localStorage.setItem("usuario", JSON.stringify(result));
-
-        // Redirección según el rol
-        if (result.rol === "Admin") {
-          router.push("/admin");
-        } else {
-          router.push("/empleado");
-        }
-      } else {
-        const errorText = await res.text();
-        console.error("❌ Login fallido. Respuesta:", errorText);
+      console.log("🔽 Respuesta del backend:", res);
+      console.log("🔽 Headers recibidos:", res.headers);
+      if (!res.ok) {
+        throw new Error("Usuario no registrado en el sistema");
       }
-    } catch (err) {
-      console.error("🚨 Error real al hacer login:", err);
+
+      const result = await res.json();
+
+      // ✅ Guardar token como cookie (cliente)
+      const token = result.token ?? result[TOKEN_NAME];
+      document.cookie = `${TOKEN_NAME}=${token}; path=/; max-age=${
+        60 * 60 * 24 * 7
+      }`;
+
+      // ✅ Guardar info útil
+      localStorage.setItem("usuario", JSON.stringify(result));
+
+      // ✅ Redirigir por rol
+      if (result.rol === "Admin") {
+        router.push("/admin");
+      } else {
+        router.push("/empleado");
+      }
+    } catch (err: any) {
+      console.error("❌ Error de login:", err.message);
+      setError("Credenciales incorrectas o usuario no registrado.");
     } finally {
       setSubmitting(false);
     }
@@ -66,9 +80,9 @@ export default function LoginPage() {
 
       <input
         className="input-custom"
-        placeholder="Usuario"
-        name="nombre_usuario"
-        type="text"
+        placeholder="Correo electrónico"
+        name="email"
+        type="email"
         required
       />
       <input
@@ -79,8 +93,10 @@ export default function LoginPage() {
         required
       />
 
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
       <button type="submit" className="button-custom" disabled={submitting}>
-        {submitting ? "Enviando..." : "Iniciar sesión"}
+        {submitting ? "Verificando..." : "Iniciar sesión"}
       </button>
     </form>
   );

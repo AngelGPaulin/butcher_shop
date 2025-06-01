@@ -4,45 +4,52 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FirebaseService } from '../shared/firebase.service';
+
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    private readonly firebaseService: FirebaseService,
   ) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
+  async create(createProductDto: CreateProductDto) {
     const product = this.productRepository.create(createProductDto);
-    return await this.productRepository.save(product);
+    const saved = await this.productRepository.save(product);
+    await this.firebaseService.broadcast('products_updates', saved);
+    return saved;
   }
 
-  findAll(): Promise<Product[]> {
+  async findAll() {
     return this.productRepository.find();
   }
 
-  async findOne(productId: string): Promise<Product> {
-    const product = await this.productRepository.findOne({
-      where: { productId },
-    });
-    if (!product) throw new NotFoundException(`Producto con ID ${productId} no encontrado`);
+  async findOne(id: string) {
+    const product = await this.productRepository.findOneBy({ productId: id });
+    if (!product) throw new NotFoundException('Product not found');
     return product;
   }
 
-  async update(productId: string, updateProductDto: UpdateProductDto): Promise<Product> {
-    const productToUpdate = await this.productRepository.preload({
-      productId,
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    const product = await this.productRepository.preload({
+      productId: id,
       ...updateProductDto,
     });
-    if (!productToUpdate) throw new NotFoundException(`Producto con ID ${productId} no encontrado`);
-    await this.productRepository.save(productToUpdate);
-    return productToUpdate;
+    if (!product) throw new NotFoundException('Product not found');
+
+    const saved = await this.productRepository.save(product);
+    await this.firebaseService.broadcast('products_updates', saved);
+    return saved;
   }
 
-  async remove(productId: string): Promise<{ message: string }> {
-    const product = await this.findOne(productId);
-    await this.productRepository.delete({ productId });
+  async remove(id: string) {
+    const product = await this.findOne(id);
+    await this.productRepository.remove(product);
+    await this.firebaseService.broadcast('products_deletes', { productId: id });
+
     return {
-      message: `Producto con ID ${productId} eliminado correctamente`,
+      message: `Product with ID ${id} deleted`,
     };
   }
 }
