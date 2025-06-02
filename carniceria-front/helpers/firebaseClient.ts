@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 const firebaseConfig = {
-  apiKey: "AIzaSyBO45V1kEkesEpkczMSPy98qzg5WUANsD8",
+  apiKey: process.env.FIREBASE_KEY,
   authDomain: "carniceriauaq.firebaseapp.com",
   databaseURL: "https://carniceriauaq-default-rtdb.firebaseio.com",
   projectId: "carniceriauaq",
