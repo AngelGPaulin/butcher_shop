@@ -11,6 +11,7 @@ const getLocalDate = () => {
   return localDate.toISOString().split("T")[0];
 };
 
+
 export default function ReportesAdminClient() {
   const [startDate, setStartDate] = useState(getLocalDate);
   const [endDate, setEndDate] = useState(getLocalDate);
