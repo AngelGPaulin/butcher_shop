@@ -10,6 +10,7 @@ const initialState = {
   nombre: "",
   apellido: "",
   telefono: "",
+  correo: "",
   direccion: "",
   nombre_usuario: "",
   contrasena: "",
@@ -72,6 +73,7 @@ const RegUsua = () => {
         apellido: form.apellido,
         telefono: form.telefono,
         direccion: form.direccion,
+        correo: form.correo,
         nombre_usuario: form.nombre_usuario,
         contrasena: form.contrasena,
         rol: form.rol,
@@ -166,6 +168,16 @@ const RegUsua = () => {
             type="tel"
             name="telefono"
             value={form.telefono}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Correo:</label>
+          <input
+            type="text"
+            name="correo"
+            value={form.correo}
             onChange={handleChange}
             required
           />

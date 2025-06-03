@@ -1,10 +1,10 @@
-.user-form {
-  max-width: 600px;
+.perfil-form {
+  max-width: 700px;
   margin: 0 auto;
   padding: 32px 24px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   font-family: Arial, sans-serif;
 }
 
@@ -20,7 +20,7 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 18px 24px;
   margin-bottom: 28px;
 }
@@ -36,8 +36,7 @@
   color: #555;
 }
 
-.form-group input,
-.form-group select {
+.form-group input {
   padding: 8px;
   border: 2px solid #222;
   border-radius: 6px;
@@ -46,8 +45,7 @@
   color: #fff;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-group input:focus {
   outline: none;
   border-color: #000;
 }
@@ -55,7 +53,9 @@
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
+  gap: 8px;  /* Reduje el espacio entre botones de 16px a 8px */
+  align-items: center;
+  margin-top: 16px; /* Espacio arriba de los botones si es necesario */
 }
 
 .btn-submit {
@@ -68,6 +68,20 @@
   cursor: pointer;
 }
 
+.section-divider {
+  border: none;
+  border-top: 2px solid #ccc;
+  margin: 2rem 0;
+}
+
+h2 {
+    text-align: left;      /* Alinea a la izquierda */
+    font-size: 1.2rem;    /* Tamaño más pequeño (ajusta el valor) */
+    margin-top: 0;        /* Elimina margen superior */
+    margin-bottom: 0.5rem; /* Espacio inferior reducido */
+    line-height: 1.2;     /* Altura de línea más ajustada */
+}
+
 .btn-cancel {
   background-color: #b71c1c;
   color: white;
@@ -77,5 +91,17 @@
   cursor: pointer;
   font-size: 16px;
   opacity: 0.9;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s;
+}
+
+.btn-cerrar-sesion {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: #b71c1c;
+  color: white;
+  position: relative;
+  top: -36px;
 }

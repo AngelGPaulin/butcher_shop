@@ -260,6 +260,15 @@ const PrincipalAdmin = () => {
               >
                 Generar Venta
               </button>
+              
+              <button
+                className="btn-genVenta"
+                onClick={() => handleRedirect("/dashboard/account")}
+              >
+                Cuenta
+              </button>
+
+              
             </div>
           </div>
         </div>
@@ -403,11 +412,7 @@ const PrincipalAdmin = () => {
             <span>Total Merma:</span> {totalMerma.toFixed(2)} kg
           </div>
         </div>
-      <div className="form-actions-cerrar">
-        <button type="button" className="btn-cerrar-sesion" onClick={() => handleRedirect("/login")}>
-        Cerrar sesión
-      </button>
-    </div>
+
       </div>
     </>
   );
