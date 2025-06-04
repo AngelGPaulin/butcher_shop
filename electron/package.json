@@ -1,0 +1,71 @@
+{
+  "name": "carniceria-electron-app",
+  "version": "1.0.0",
+  "description": "Desktop application for Carniceria app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^26.3.2",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "electron-log": "^4.4.8"
+  },
+  "build": {
+    "appId": "com.yourcompany.carniceriaapp",
+    "productName": "Carniceria App",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../carniceria-firebase-backend",
+        "to": "carniceria-firebase-backend",
+        "filter": [
+          "**/*",
+          "!node_modules"
+        ]
+      },
+      {
+        "from": "../carniceria-firebase-backend/node_modules",
+        "to": "carniceria-firebase-backend/node_modules",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../carniceria-firebase-front",
+        "to": "carniceria-firebase-front",
+        "filter": [
+          "**/*",
+          "!node_modules"
+        ]
+      },
+      {
+        "from": "../carniceria-firebase-front/node_modules",
+        "to": "carniceria-firebase-front/node_modules",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/logo.ico"
+ 
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "forceCodeSigning": false 
+  }
+}

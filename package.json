@@ -1,0 +1,50 @@
+{
+  "name": "carniceria",
+  "version": "1.0.0",
+  "description": "App de gestión para carnicería local",
+  "author": "Angel Paulin",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev:all": "concurrently \"npm run dev --prefix carniceria-firebase-front\" \"npm run electron\"",
+    "electron": "cross-env NODE_ENV=development electron electron/main.js",
+    "build:electron": "electron-builder",
+    "start": "next start -p 3000"
+  },
+  "dependencies": {
+    "wait-on": "^7.2.0",
+    "electron-log": "^4.4.8"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^26.3.2",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.carniceria.app",
+    "productName": "Carnicería App",
+    "files": [
+      "electron/**/*",
+      "carniceria-firebase-backend/**/*",
+      "carniceria-firebase-front/.next/**/*",
+      "carniceria-firebase-front/public/**/*",
+      "carniceria-firebase-front/package.json",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/logo.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
