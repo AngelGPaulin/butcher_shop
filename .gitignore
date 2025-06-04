@@ -24,6 +24,9 @@ carniceria-backend/postgres-carniceria/
 # Sistema operativo
 .DS_Store
 Thumbs.db
+dist-electron/
+*.exe
+*.zip
 
 # impide subir rar y zip
 *.zip
